@@ -14,6 +14,7 @@ const (
 	DEFAULT_PORT = "8000"
 )
 
+var config map[string]string
 var mux sync.Mutex
 var count int = 0
 
@@ -21,12 +22,20 @@ var IP string
 var PORT string
 
 func main() {
-	IP = GetIpFromCmd()
-	PORT = GetPortFromCmd()
+	IP = GetParamFromCmd("-h")
+	PORT = GetParamFromCmd("-p")
+	//IP = GetIpFromCmd()
+	//PORT = GetPortFromCmd()
 
 	http.HandleFunc("/", handler_nice)
 	http.HandleFunc("/count", handler_count)
 	log.Fatal(http.ListenAndServe(IP+":"+PORT, nil))
+}
+
+func init() {
+	config = make(map[string]string)
+	config["-h"] = "localhost"
+	config["-p"] = "8000"
 }
 
 func GetIpFromCmd() string {
@@ -51,6 +60,18 @@ func GetPortFromCmd() string {
 	}
 
 	return DEFAULT_PORT
+}
+
+func GetParamFromCmd(prefix string) string {
+	for i, v := range os.Args {
+		if strings.HasPrefix(v, prefix) && v != prefix {
+			return v[2:]
+		} else if v == prefix {
+			return os.Args[i+1]
+		}
+	}
+
+	return config[prefix]
 }
 
 func handler_nice(w http.ResponseWriter, r *http.Request) {
