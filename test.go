@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
+	//"strconv"
 )
 
 type A struct{}
@@ -19,15 +21,42 @@ func inti() {
 }
 
 func main() {
-	testStruct()
+	//testStruct()
 
-	testBufio()
+	//testBufio()
 
 	//testHttp()
 
-	testCountBit()
+	//testCountBit()
 
-	testRawString()
+	//testRawString()
+
+	// GetInput()
+
+	iNow := time.Now().Unix()
+	fmt.Println(iNow)
+
+	//arr := new([]int)
+	//*arr = append(*arr, 2)
+	//*arr = append(*arr, 3)
+	//fmt.Println(*arr)
+	a := 123
+	fmt.Println(a/4)
+}
+
+func testSlice(a []int) []int {
+	a = append(a, 3)
+	a = append(a, 5)
+	return a
+}
+
+func GetInput() {
+	input := bufio.NewScanner(os.Stdin)
+	input.Split(bufio.ScanWords)
+	for input.Scan() {
+		word := input.Text()
+		fmt.Printf("%s ", word)
+	}
 }
 
 func testStruct() {
