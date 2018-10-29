@@ -73,7 +73,7 @@ func DaysDiff(d *Date, other *Date) int {
 	d1 := d.DayInYear()
 	d2 := other.DayInYear()
 
-	diff := (d.year-other.year)*365 + d1 - d2 + (d.year / 4) - (other.year / 4)
+	diff := (d.year-other.year)*365 + d1 - d2 + (d.year / 4) - (other.year / 4) - (d.year / 100) + (other.year / 100)
 	return diff
 }
 
@@ -99,13 +99,25 @@ func Comapre(d *Date, other *Date) int {
 	return 0
 }
 
-func ChangeStringToDate(date string) Date {
+func ChangeStringToDate(date string) (Date, error) {
 	s := strings.Split(date, "-")
-	y, _ := strconv.Atoi(s[0])
-	m, _ := strconv.Atoi(s[1])
-	d, _ := strconv.Atoi(s[2])
 
-	return Date{y, m, d}
+	y, err := strconv.Atoi(s[0])
+	if err != nil {
+		return Date{0, 0, 0}, err
+	}
+
+	m, err := strconv.Atoi(s[1])
+	if err != nil {
+		return Date{0, 0, 0}, err
+	}
+
+	d, err := strconv.Atoi(s[2])
+	if err != nil {
+		return Date{0, 0, 0}, err
+	}
+
+	return Date{y, m, d}, nil
 }
 
 func main() {
@@ -115,12 +127,16 @@ func main() {
 	days := DaysDiff(&d1, &d2)
 	fmt.Println(days)
 
-	dd := ChangeStringToDate("2018-12-12")
+	dd, _ := ChangeStringToDate("2018-12-12")
 	fmt.Println(dd)
 
 	days = DaysDiff(&d1, &dd)
 	fmt.Println(days)
 
 	fmt.Println(dd.GetMonthString())
+
+	d3 := Date{2018,1,1}
+	d4 := Date{2018,1,1}
+	fmt.Println(DaysDiff(&d3, &d4))
 }
 
