@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+// CheckIdentity 简单校验身份证号码是否正确
 func CheckIdentity(number string) bool {
 	l := len(number)
 	if l < 18 {
