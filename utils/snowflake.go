@@ -17,7 +17,7 @@ const (
 )
 
 type Snowflake struct {
-	TimeMsId     int64
+	TimeMsId     int64 // 毫秒值
 	DataCenterId int64
 	WorkerId     int64
 	SequenceId   int64
@@ -28,7 +28,7 @@ type Snowflake struct {
 func (s *Snowflake) Initial(dataCenter, worker int64) {
 	s.DataCenterId = dataCenter
 	s.WorkerId = worker
-	s.TimeMsId = time.Now().Unix()
+	s.TimeMsId = time.Now().UnixNano() / 1e6
 	s.SequenceId = 0
 }
 
@@ -38,7 +38,7 @@ func (s *Snowflake) NextId() (int64, error) {
 	defer s.mutex.Unlock()
 
 	var id int64
-	timeMs := time.Now().Unix()
+	timeMs := time.Now().UnixNano() / 1e6
 	if timeMs < s.TimeMsId {
 		return 0, fmt.Errorf("timer invalid")
 	}
@@ -47,7 +47,7 @@ func (s *Snowflake) NextId() (int64, error) {
 		s.SequenceId = (s.SequenceId + 1) & sequenceMask
 		if s.SequenceId == 0 { /// 毫秒内序列溢出，阻塞到下一毫秒
 			for timeMs <= s.TimeMsId {
-				timeMs = time.Now().Unix()
+				timeMs = time.Now().UnixNano() / 1e6
 			}
 		}
 	} else {
@@ -61,6 +61,11 @@ func (s *Snowflake) NextId() (int64, error) {
 }
 
 func main() {
+	start := time.Now().UnixNano()
+	defer func() {
+		fmt.Printf("cost time = %d ns\n", time.Now().UnixNano()-start)
+	}()
+
 	s := Snowflake{}
 	s.Initial(12, 13)
 
@@ -87,5 +92,5 @@ func main() {
 
 	w.Wait()
 
-	fmt.Printf("m size = %d", len(m))
+	fmt.Printf("m size = %d\n", len(m))
 }
